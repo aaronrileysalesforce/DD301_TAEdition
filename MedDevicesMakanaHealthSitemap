@@ -1,0 +1,228 @@
+Evergage.init().then(() => {
+    var config = {
+        global: {
+            contentZones: [                
+                { name: "Hero", selector: ".hero" },
+                { name: "Newsletter CTA", selector: ".cta.newsletter" },
+                { name: "Article Recs", selector: ".articles" },
+                { name: "Body", selector: "body"},
+                { name: "Header", selector: "body > header > nav"},
+                { name: "Global Pop-Up", selector: "head"},
+                { name: "Global Infobar Top of Page"},
+                { name: "Global Infobar Bottom of Page"}            
+            ]
+        },
+        pageTypes: []
+    };
+
+    config.global.onActionEvent = function(event) {
+        return event;
+    };    
+
+    var catalogFromDataLayer = {        
+        Product: {              
+            name: () => {                                                                                                              
+                    //console.log(dataLayer);
+                    for (let i = 0; i < dataLayer.length; i++) {                            
+                        if (dataLayer[i].event == "InteractionStudio") {                               
+                                if (dataLayer[i]["name"]) {                                                                                                 
+                                return dataLayer[i]["name"];                                                            
+                            }                  
+                        }       
+                    }                   
+                    return window.location.pathname.replace(/[!@#$%^&*]/g, "");
+            },            
+            _id: () => {
+                if (window.location.pathname) {
+                    return window.location.pathname.replace(/[!@#$%^&*]/g, "");
+                }
+                else {
+                    return "Unmapped Web Page";
+                }
+            },
+           /*name: () => {
+                if (window.location.pathname) {
+                    return window.location.pathname.replace(/[!@#$%^&*]/g, "");
+                }
+                else {
+                    return "Unmapped Web Page";
+                }
+            },*/
+            
+            url: Evergage.resolvers.fromHref(),
+            
+            imageUrl: () => {                                                                                                              
+                    for (let i = 0; i < dataLayer.length; i++) {          
+                        if (dataLayer[i].event == "InteractionStudio") {                               
+                            if (dataLayer[i].imgThumb) {                                                                
+                                return dataLayer[i].imgThumb;
+                            }                  
+                        }       
+                    }                   
+                    return "";                                            
+            },
+            categories: () => {
+                    var ProductCategoryArray = [];                                                                                                                 
+
+                    for (let i = 0; i < dataLayer.length; i++) {          
+                        if (dataLayer[i].event == "InteractionStudio") {                               
+                            if (dataLayer[i].category) {                                                                
+                                ProductCategoryArray.push(dataLayer[i]["category"]);                                
+                            }                  
+                        }       
+                    }                   
+        
+                    if (!ProductCategoryArray[0]) {                                                
+                        ProductCategoryArray.push("Unmapped Category");                        
+                    }                   
+                    
+                    return ProductCategoryArray;
+            },
+            dimensions: {                
+                ItemClass: () => {                    
+                    var ItemArray = [];
+                                        
+                    for (let i = 0; i < dataLayer.length; i++) {          
+                        if (dataLayer[i].event == "InteractionStudio") {                               
+                            if (dataLayer[i]["sub-category"]) {                                                                 
+                                ItemArray.push(dataLayer[i]["sub-category"]);
+                            }                  
+                        }       
+                    }       
+                    return ItemArray;
+                },                    
+                Brand: () => {
+                    var BrandArray = [];
+
+                    for (let i = 0; i < dataLayer.length; i++) {          
+                        if (dataLayer[i].event == "InteractionStudio") {                               
+                            if (dataLayer[i].division) {                                                                
+                                BrandArray.push(dataLayer[i]["division"]);
+                            }                  
+                        }       
+                    }       
+                    return BrandArray;
+                },
+                Style: () => {
+                    var StyleArray = [];    
+
+                    for (let i = 0; i < dataLayer.length; i++) {          
+                        if (dataLayer[i].event == "InteractionStudio") {                               
+                            if (dataLayer[i].item) {                                                                
+                                StyleArray.push(dataLayer[i]["item"]);                    
+                            }                  
+                        }       
+                    }       
+                    return StyleArray;
+                }
+            }
+        }
+    };
+
+
+    // Universal page type
+    config.pageTypes.push({
+        isMatch: () => {
+            return true
+        },
+        name: () => {
+            if (window.location.pathname) {
+                return window.location.pathname.replace(/[!@#$%^&*]/g, "");
+            }
+            else {
+                return "Unmapped Web Page";
+            }
+        },        
+        action: () => {
+            if (window.location.pathname) {
+            return window.location.pathname;           
+            }
+            else {
+                return "Unmapped Web Page";
+            }
+        },
+        catalog: catalogFromDataLayer,
+        listeners: [
+            // Listener for Provider Consultation Form submission
+            Evergage.listener("click", "#consult-submit", () => {                         
+                var first_name = Evergage.cashDom("#first_name").val();
+                var last_name = Evergage.cashDom("#last_name").val();           
+                var email = Evergage.cashDom("#email").val();
+                var phone = Evergage.cashDom("#phone").val();
+                var datepicker = Evergage.cashDom("#datepicker").val();
+                var concerns = Evergage.cashDom("#concerns").val();
+
+                if (email) {                    
+                    Evergage.sendEvent({action: "Provider Schedule Consult - Completed", 
+                        user: {
+                            identities: {
+                                emailAddress: email
+                            },
+                            attributes: {
+                                userId: email,
+                                emailAddress: email,                                                 
+                                firstName: first_name,
+                                lastName: last_name,
+                                ConsultationScheduled: 'True',
+                                phoneNumber: phone,
+                                appointment: datepicker,
+                                concerns: concerns
+                            }
+                        }
+                    });
+                }
+            }),  
+            // Listener for Makana Newsletter Sign-Up
+            Evergage.listener("click", ".btn-secondary", () => {                    
+                
+                var firstname = Evergage.cashDom("#firstname").val();           
+                var email = Evergage.cashDom("#email").val();
+                                
+                if (email) {                    
+                    Evergage.sendEvent({action: "Makana Newsletter Sign-Up", 
+                        user: { 
+                            identities: { 
+                                emailAddress: email 
+                                },                      
+                            attributes: {                                
+                                emailAddress: email,                                             
+                                firstName: firstname,
+                                EmailOptIn: 'True'
+                            }
+                        }
+                    });
+                }                
+            }),
+             // Listener for webinar submission
+            Evergage.listener("click", "#webinar-submit", () => {                    
+                var first_name = Evergage.cashDom("#first_name").val();
+                var last_name = Evergage.cashDom("#last_name").val();
+                var title = Evergage.cashDom("#title").val();                
+                var email = Evergage.cashDom("#email").val();
+                var emailOptIn = Evergage.cashDom("#optin").val();
+                
+                if (email) {                    
+                    Evergage.sendEvent({action: "Webinar Submission", 
+                        user: { 
+                            identities: { 
+                                emailAddress: email 
+                                },                    
+                            attributes: {                                
+                                userId: email,
+                                emailAddress: email,                                             
+                                firstName: first_name,
+                                lastName: last_name,
+                                medDesignation: title,
+                                EmailOptIn: 'True'
+                            }
+                        }
+                    });
+                }                
+            })
+        ]
+    });
+
+    Evergage.cashDom(() => {
+        Evergage.initSitemap(config);
+    });
+});
