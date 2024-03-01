@@ -16,6 +16,25 @@ Evergage.init().then(() => {
     };
 
     config.global.onActionEvent = function(event) {
+        
+        if (event.user) {
+
+            //Get Email Address from querystring
+            var myEmail = Evergage.util.getParameterByName("subscriberkey");
+            alert(myEmail);
+            if (myEmail) {
+                event.user.id = myEmail;
+                event.user.attributes = {emailAddress: myEmail};
+                console.log ("Setting user.id to: " + myEmail);
+            } else {
+                myEmail = Evergage.util.getValueFromNestedObject("window._etmc.user_info.email");
+                if (myEmail) {
+                    event.user.id = myEmail;
+                    event.user.attributes = {emailAddress: myEmail};
+                    console.log ("Setting user.id to: " + myEmail);
+                }
+            }
+        }
         return event;
     };    
 
