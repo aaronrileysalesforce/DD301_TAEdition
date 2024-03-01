@@ -21,7 +21,7 @@ Evergage.init().then(() => {
 
             //Get Email Address from querystring
             var myEmail = Evergage.util.getParameterByName("subscriberkey");
-            alert(myEmail);
+            //alert(myEmail);
             if (myEmail) {
                 event.user.id = myEmail;
                 event.user.attributes = {emailAddress: myEmail};
