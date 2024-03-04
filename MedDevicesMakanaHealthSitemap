@@ -24,13 +24,13 @@ Evergage.init().then(() => {
             //alert(myEmail);
             if (myEmail) {
                 event.user.id = myEmail;
-                event.user.attributes = {emailAddress: myEmail};
+                event.user.attributes = {emailAddress: myEmail, sfmcContactKey: myEmail};
                 console.log ("Setting user.id to: " + myEmail);
             } else {
                 myEmail = Evergage.util.getValueFromNestedObject("window._etmc.user_info.email");
                 if (myEmail) {
                     event.user.id = myEmail;
-                    event.user.attributes = {emailAddress: myEmail};
+                    event.user.attributes = {emailAddress: myEmail, sfmcContactKey: myEmail};
                     console.log ("Setting user.id to: " + myEmail);
                 }
             }
