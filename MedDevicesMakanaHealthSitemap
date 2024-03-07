@@ -20,7 +20,7 @@ Evergage.init().then(() => {
         if (event.user) {
 
             //Get Email Address from querystring
-            var myEmail = Evergage.util.getParameterByName("subscriberkey");
+            var myEmail = Evergage.util.getParameterByName("email");
             //alert(myEmail);
             if (myEmail) {
                 event.user.id = myEmail;
